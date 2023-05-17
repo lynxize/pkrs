@@ -1,13 +1,14 @@
 use std::error::Error;
-use reqwest::{Client, RequestBuilder, Response};
+
+use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 
 use crate::endpoints::*;
 
 pub struct PkClient {
-    client: Client,
-    token: String,
-    user_agent: String,
+    pub(crate) client: Client,
+    pub(crate) token: String,
+    pub(crate) user_agent: String,
 }
 
 impl PkClient {

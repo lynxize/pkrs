@@ -1,13 +1,15 @@
-mod types;
-mod endpoints;
-
 use std::error::Error;
 use std::fs;
 
 use clap::builder::Str;
 use clap::Command;
-use reqwest::{Client, RequestBuilder, Response};
-use serde::{Deserialize, Serialize};
+use reqwest::Client;
+
+use crate::endpoints::*;
+use crate::types::*;
+
+mod types;
+mod endpoints;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -20,8 +22,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Command::new("pkrs")
         .author("_Snowdrift <snowdriftdev@gmail.com>")
         .about("PluralKit Nonsense")
-
-
 
 
     Ok(())

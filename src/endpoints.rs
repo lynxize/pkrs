@@ -1,4 +1,5 @@
 use std::error::Error;
+
 use reqwest::{Client, RequestBuilder, Response};
 use serde::{Deserialize, Serialize};
 
