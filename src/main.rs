@@ -2,13 +2,13 @@ use std::error::Error;
 use std::fs;
 
 use clap::builder::Str;
-use reqwest::Client;
-use serde::Deserialize;
+use reqwest::{Client, RequestBuilder, Response};
+use serde::{Deserialize, Serialize};
 
 const BASE_URL: &str = "https://api.pluralkit.me/v2/";
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), Box<dyn Error>> {
     println!("A little PluralKit Nonsense");
     let client = PkClient {
         client: Client::new(),
@@ -36,8 +36,7 @@ impl PkClient {
         where
             T: for<'a> Deserialize<'a>,
     {
-        let res = self
-            .client
+        let res = self.client
             .get(BASE_URL.to_string() + endpoint)
             .header("User-Agent", &self.user_agent)
             .header("Authorization", &self.token)
@@ -48,9 +47,57 @@ impl PkClient {
 
         Ok(res)
     }
+
+    pub async fn patch<T>(&self, endpoint: &str, body: &T) -> Result<T, Box<dyn Error>>
+        where
+            T: for<'a> Deserialize<'a>,
+            T: Serialize
+    {
+        let res = self.client
+            .patch(BASE_URL.to_string() + endpoint)
+            .header("User-Agent", &self.user_agent)
+            .header("Authorization", &self.token)
+            .json(body)
+            .send()
+            .await?
+            .json::<T>()
+            .await?;
+
+        Ok(res)
+    }
+
+    pub async fn post<T>(&self, endpoint: &str, body: &T) -> Result<T, Box<dyn Error>>
+        where
+            T: for<'a> Deserialize<'a>,
+            T: Serialize
+    {
+        let res = self.client
+            .post(BASE_URL.to_string() + endpoint)
+            .header("User-Agent", &self.user_agent)
+            .header("Authorization", &self.token)
+            .json(body)
+            .send()
+            .await?
+            .json::<T>()
+            .await?;
+
+        Ok(res)
+    }
+
+    pub async fn delete(&self, endpoint: &str) -> Result<Response, Box<dyn Error>>
+    {
+        let res = self.client
+            .delete(BASE_URL.to_string() + endpoint)
+            .header("User-Agent", &self.user_agent)
+            .header("Authorization", &self.token)
+            .send()
+            .await?;
+
+        Ok(res)
+    }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct System {
     id: String,
     name: Option<String>,
@@ -75,9 +122,31 @@ impl System {
     ) -> Result<Vec<Group>, Box<dyn Error>> {
         get_system_groups(client, self.id.as_str()).await
     }
+
+    pub async fn get_settings(
+        &self,
+        client: &PkClient,
+    ) -> Result<SystemSettings, Box<dyn Error>> {
+        get_system_settings(client, self.id.as_str()).await
+    }
+
+    pub async fn get_guild_settings(
+        &self,
+        client: &PkClient,
+        guild_id: &str,
+    ) -> Result<SystemGuildSettings, Box<dyn Error>> {
+        get_system_guild_settings(client, self.id.as_str(), guild_id).await
+    }
+
+    pub async fn get_autoproxy_settings(
+        &self,
+        client: &PkClient,
+    ) -> Result<AutoProxySettings, Box<dyn Error>> {
+        get_system_autoproxy_settings(client, self.id.as_str()).await
+    }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct SystemPrivacy {
     description_privacy: String,
     pronoun_privacy: String,
@@ -87,7 +156,7 @@ pub struct SystemPrivacy {
     front_history_privacy: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Member {
     id: String,
     uuid: String,
@@ -123,7 +192,7 @@ impl Member {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct MemberPrivacy {
     visibility: String,
     name_privacy: String,
@@ -134,13 +203,13 @@ pub struct MemberPrivacy {
     metadata_privacy: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct ProxyTag {
     prefix: Option<String>,
     suffix: Option<String>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Group {
     id: String,
     uuid: String,
@@ -162,7 +231,7 @@ impl Group {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct GroupPrivacy {
     name_privacy: String,
     description_privacy: String,
@@ -172,14 +241,14 @@ pub struct GroupPrivacy {
     visibility: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Switch {
     id: String,
     time: String,
     members: Vec<SwitchMember>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub enum SwitchMember {
     Full(Box<Member>),
     Id(String),
@@ -196,7 +265,7 @@ pub struct Message {
     member: Option<Member>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct SystemSettings {
     timezone: String,
     pings_enabled: bool,
@@ -208,7 +277,7 @@ pub struct SystemSettings {
     group_limit: i32,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct SystemGuildSettings {
     guild_id: Option<String>,
     proxying_enabled: bool,
@@ -216,14 +285,14 @@ pub struct SystemGuildSettings {
     tag_enabled: bool,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct AutoProxySettings {
     autoproxy_mode: AutoProxyMode,
     autoproxy_member: Option<String>,
     last_latch_timestamp: Option<String>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub enum AutoProxyMode {
     Off,
     Front,
@@ -231,7 +300,7 @@ pub enum AutoProxyMode {
     Member,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct MemberGuildSettings {
     guild_id: String,
     display_name: Option<String>,
@@ -246,6 +315,68 @@ pub async fn get_system(
     client.get(req.as_str()).await
 }
 
+pub async fn update_system(
+    client: &PkClient,
+    system: &System,
+) -> Result<System, Box<dyn Error>> {
+    let req = "systems/".to_string() + &*system.id;
+    client.patch(req.as_str(), system).await
+}
+
+pub async fn get_system_settings(
+    client: &PkClient,
+    system_id: &str,
+) -> Result<SystemSettings, Box<dyn Error>> {
+    let req = "systems/".to_string() + system_id + "/settings";
+    client.get(req.as_str()).await
+}
+
+pub async fn update_system_settings(
+    client: &PkClient,
+    system_id: &str,
+    settings: &SystemSettings,
+) -> Result<SystemSettings, Box<dyn Error>> {
+    let req = "systems/".to_string() + system_id + "/settings";
+    client.patch(req.as_str(), settings).await
+}
+
+pub async fn get_system_guild_settings(
+    client: &PkClient,
+    system_id: &str,
+    guild_id: &str,
+) -> Result<SystemGuildSettings, Box<dyn Error>> {
+    let req = "systems/".to_string() + system_id + "/settings/guilds/" + guild_id;
+    client.get(req.as_str()).await
+}
+
+pub async fn update_system_guild_settings(
+    client: &PkClient,
+    system_id: &str,
+    guild_id: &str,
+    settings: &SystemGuildSettings,
+) -> Result<SystemGuildSettings, Box<dyn Error>> {
+    let req = "systems/".to_string() + system_id + "/settings/guilds/" + guild_id;
+    client.patch(req.as_str(), settings).await
+}
+
+pub async fn get_system_autoproxy_settings(
+    client: &PkClient,
+    system_id: &str,
+) -> Result<AutoProxySettings, Box<dyn Error>> {
+    // todo: handle query params
+    let req = "systems/".to_string() + system_id + "/autoproxy";
+    client.get(req.as_str()).await
+}
+
+pub async fn update_system_autoproxy_settings(
+    client: &PkClient,
+    system_id: &str,
+    settings: &AutoProxySettings,
+) -> Result<AutoProxySettings, Box<dyn Error>> {
+    let req = "systems/".to_string() + system_id + "/autoproxy";
+    client.patch(req.as_str(), settings).await
+}
+
 pub async fn get_system_members(
     client: &PkClient,
     system_id: &str,
@@ -254,12 +385,163 @@ pub async fn get_system_members(
     client.get(req.as_str()).await
 }
 
+pub async fn create_member(
+    client: &PkClient,
+    member: &Member,
+) -> Result<Member, Box<dyn Error>> {
+    client.post("members", member).await
+}
+
+pub async fn get_member(
+    client: &PkClient,
+    member_id: &str,
+) -> Result<Member, Box<dyn Error>> {
+    let req = "members/".to_string() + member_id;
+    client.get(req.as_str()).await
+}
+
+pub async fn update_member(
+    client: &PkClient,
+    member: &Member,
+) -> Result<Member, Box<dyn Error>> {
+    let req = "members/".to_string() + &*member.id;
+    client.patch(req.as_str(), member).await
+}
+
+pub async fn delete_member(
+    client: &PkClient,
+    member_id: &str,
+) -> Result<Response, Box<dyn Error>> {
+    let req = "members/".to_string() + member_id;
+    client.delete(req.as_str()).await
+}
+
+pub async fn get_member_groups(
+    client: &PkClient,
+    member_id: &str,
+) -> Result<Vec<Group>, Box<dyn Error>> {
+    let req = "members/".to_string() + member_id + "/groups";
+    client.get(req.as_str()).await
+}
+
+pub async fn add_member_groups(
+    client: &PkClient,
+    member_id: &str,
+    group_id: &str,
+) -> Result<(), Box<dyn Error>> {
+    let req = "members/".to_string() + member_id + "/groups/add";
+    todo!()
+}
+
+pub async fn remove_member_groups(
+    client: &PkClient,
+    member_id: &str,
+    group_id: &str,
+) -> Result<(), Box<dyn Error>> {
+    let req = "members/".to_string() + member_id + "/groups/remove";
+    todo!()
+}
+
+pub async fn overwrite_member_groups(
+    client: &PkClient,
+    member_id: &str,
+    group_ids: &Vec<String>,
+) -> Result<(), Box<dyn Error>> {
+    let req = "members/".to_string() + member_id + "/groups/overwrite";
+    todo!()
+}
+
+pub async fn get_member_guild_settings(
+    client: &PkClient,
+    member_id: &str,
+    guild_id: &str,
+) -> Result<Vec<MemberGuildSettings>, Box<dyn Error>> {
+    let req = "members/".to_string() + member_id + "/guilds/" + guild_id;
+    client.get(req.as_str()).await
+}
+
+pub async fn update_member_guild_settings(
+    client: &PkClient,
+    member_id: &str,
+    guild_id: &str,
+    settings: &MemberGuildSettings,
+) -> Result<MemberGuildSettings, Box<dyn Error>> {
+    let req = "members/".to_string() + member_id + "/guilds/" + guild_id;
+    client.patch(req.as_str(), settings).await
+}
+
 pub async fn get_system_groups(
     client: &PkClient,
     system_id: &str,
 ) -> Result<Vec<Group>, Box<dyn Error>> {
     let req = "systems/".to_string() + system_id + "/groups";
     client.get(req.as_str()).await
+}
+
+pub async fn create_group(
+    client: &PkClient,
+    group: &Group,
+) -> Result<Group, Box<dyn Error>> {
+    client.post("groups", group).await
+}
+
+pub async fn get_group(
+    client: &PkClient,
+    group_id: &str,
+) -> Result<Group, Box<dyn Error>> {
+    let req = "groups/".to_string() + group_id;
+    client.get(req.as_str()).await
+}
+
+pub async fn update_group(
+    client: &PkClient,
+    group: &Group,
+) -> Result<Group, Box<dyn Error>> {
+    let req = "groups/".to_string() + &*group.id;
+    client.patch(req.as_str(), group).await
+}
+
+pub async fn delete_group(
+    client: &PkClient,
+    group_id: &str,
+) -> Result<Response, Box<dyn Error>> {
+    let req = "groups/".to_string() + group_id;
+    client.delete(req.as_str()).await
+}
+
+pub async fn get_group_members(
+    client: &PkClient,
+    group_id: &str,
+) -> Result<Vec<Member>, Box<dyn Error>> {
+    let req = "groups/".to_string() + group_id + "/members";
+    client.get(req.as_str()).await
+}
+
+pub async fn add_group_members(
+    client: &PkClient,
+    group_id: &str,
+    member_id: &str,
+) -> Result<(), Box<dyn Error>> {
+    let req = "groups/".to_string() + group_id + "/members/add";
+    todo!()
+}
+
+pub async fn remove_group_members(
+    client: &PkClient,
+    group_id: &str,
+    member_id: &str,
+) -> Result<(), Box<dyn Error>> {
+    let req = "groups/".to_string() + group_id + "/members/remove";
+    todo!()
+}
+
+pub async fn overwrite_group_members(
+    client: &PkClient,
+    group_id: &str,
+    member_ids: &Vec<String>,
+) -> Result<(), Box<dyn Error>> {
+    let req = "groups/".to_string() + group_id + "/members/overwrite";
+    todo!()
 }
 
 pub async fn get_system_switches(
@@ -273,29 +555,31 @@ pub async fn get_system_switches(
     client.get(req.as_str()).await
 }
 
-pub async fn get_member(
+pub async fn get_system_fronters(
     client: &PkClient,
-    member_id: &str,
-) -> Result<Member, Box<dyn Error>> {
-    let req = "members/".to_string() + member_id;
+    system_id: &str,
+) -> Result<Switch, Box<dyn Error>> {
+    let req = "systems/".to_string() + system_id + "/fronters";
     client.get(req.as_str()).await
 }
 
-pub async fn get_member_groups(
+pub async fn create_switch(
     client: &PkClient,
-    member_id: &str,
-) -> Result<Vec<Group>, Box<dyn Error>> {
-    let req = "members/".to_string() + member_id + "/groups";
-    client.get(req.as_str()).await
-}
+    system_id: &str,
+    member_ids: &Vec<&str>,
+    time: String
+) {
+    #[derive(Serialize, Deserialize, Debug)]
+    struct JsonSwitch {
+        timestamp: String,
+        members: Vec<String>
+    }
 
-pub async fn get_member_guild_settings(
-    client: &PkClient,
-    member_id: &str,
-    guild_id: &str,
-) -> Result<Vec<MemberGuildSettings>, Box<dyn Error>> {
-    let req = "members/".to_string() + member_id + "/guilds/" + guild_id;
-    client.get(req.as_str()).await
+    let req = "systems/".to_string() + system_id + "/switches";
+    client.post::<JsonSwitch>(req.as_str(), &JsonSwitch {
+        timestamp: time,
+        members: member_ids.iter().map(|&s|s.into()).collect()
+    });
 }
 
 pub async fn get_message(
@@ -303,21 +587,5 @@ pub async fn get_message(
     id: &str,
 ) -> Result<Message, Box<dyn Error>> {
     let req = "messages/".to_string() + id;
-    client.get(req.as_str()).await
-}
-
-pub async fn get_group(
-    client: &PkClient,
-    group_id: &str,
-) -> Result<Group, Box<dyn Error>> {
-    let req = "groups/".to_string() + group_id;
-    client.get(req.as_str()).await
-}
-
-pub async fn get_group_members(
-    client: &PkClient,
-    group_id: &str,
-) -> Result<Vec<Member>, Box<dyn Error>> {
-    let req = "groups/".to_string() + group_id + "/members";
     client.get(req.as_str()).await
 }
