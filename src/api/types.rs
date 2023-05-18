@@ -26,7 +26,7 @@ impl PkClient {
             .await?
             .json::<T>()
             .await?;
-
+        //println!("{:#?}", res);
         Ok(res)
     }
 
@@ -93,9 +93,8 @@ pub struct System {
 }
 
 impl System {
-    pub async fn update(mut self, client: &PkClient) -> Result<(), Box<dyn Error>> {
-        self = update_system(client, &self).await?;
-        Ok(())
+    pub async fn update(&self, client: &PkClient) -> Result<System, Box<dyn Error>> {
+        update_system(client, &self).await
     }
 
     pub async fn get_settings(&self, client: &PkClient) -> Result<SystemSettings, Box<dyn Error>> {
