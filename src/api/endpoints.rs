@@ -3,7 +3,7 @@ use std::error::Error;
 use reqwest::{Client, RequestBuilder, Response};
 use serde::{Deserialize, Serialize};
 
-use crate::types::*;
+use crate::api::types::*;
 
 pub const BASE_URL: &str = "https://api.pluralkit.me/v2/";
 

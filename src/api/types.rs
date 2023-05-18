@@ -1,10 +1,10 @@
 use std::error::Error;
-use clap::ValueEnum;
 
+use clap::ValueEnum;
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 
-use crate::endpoints::*;
+use crate::api::endpoints::*;
 
 pub struct PkClient {
     pub(crate) client: Client,
