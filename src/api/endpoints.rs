@@ -57,7 +57,7 @@ pub async fn get_system_autoproxy_settings(
     client: &PkClient,
     system_id: &str,
 ) -> Result<AutoProxySettings, Box<dyn Error>> {
-    // todo: handle query params
+    todo!(); // need to handle query string
     let req = "systems/".to_string() + system_id + "/autoproxy";
     client.get(req.as_str()).await
 }
@@ -67,6 +67,7 @@ pub async fn update_system_autoproxy_settings(
     system_id: &str,
     settings: &AutoProxySettings,
 ) -> Result<AutoProxySettings, Box<dyn Error>> {
+    todo!(); // need to handle query string
     let req = "systems/".to_string() + system_id + "/autoproxy";
     client.patch(req.as_str(), settings).await
 }
