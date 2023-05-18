@@ -1,4 +1,5 @@
 use std::error::Error;
+use clap::ValueEnum;
 
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
@@ -396,7 +397,7 @@ pub struct AutoProxySettings {
     pub last_latch_timestamp: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone, ValueEnum)]
 pub enum AutoProxyMode {
     Off,
     Front,
