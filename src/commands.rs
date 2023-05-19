@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 use clap::{Arg, ArgAction, Command};
 
-use crate::api::types::AutoProxyMode;
+use crate::types::AutoProxyMode;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]

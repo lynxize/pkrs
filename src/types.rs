@@ -4,7 +4,7 @@ use clap::ValueEnum;
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 
-use crate::api::endpoints::*;
+use crate::api::*;
 
 pub struct PkClient {
     pub(crate) client: Client,

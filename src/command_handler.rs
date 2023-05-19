@@ -4,14 +4,14 @@ use clap::Parser;
 
 use reqwest::Client;
 
-use crate::api::endpoints::*;
-use crate::api::types::*;
-use crate::command::commands::*;
+use crate::api::*;
+use crate::types::*;
+use crate::commands::*;
 
 pub(crate) async fn handle_commands() -> Result<(), Box<dyn Error>>{
     let mut client = PkClient {
         client: Client::new(),
-        token: fs::read_to_string("token").expect("No PK token found!"),
+        token: fs::read_to_string("../token").expect("No PK token found!"),
         user_agent: "Testing Rust CLI nonsense".to_string(),
     };
 
