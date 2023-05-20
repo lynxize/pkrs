@@ -1,9 +1,10 @@
 use std::error::Error;
 
 mod api;
-mod types;
 mod command_handler;
 mod commands;
+mod types;
+mod util;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {

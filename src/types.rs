@@ -14,8 +14,8 @@ pub struct PkClient {
 
 impl PkClient {
     pub async fn get<T>(&self, endpoint: &str) -> Result<T, Box<dyn Error>>
-        where
-            T: for<'a> Deserialize<'a>,
+    where
+        T: for<'a> Deserialize<'a>,
     {
         let res = self
             .client
@@ -31,9 +31,9 @@ impl PkClient {
     }
 
     pub async fn patch<T>(&self, endpoint: &str, body: &T) -> Result<T, Box<dyn Error>>
-        where
-            T: for<'a> Deserialize<'a>,
-            T: Serialize,
+    where
+        T: for<'a> Deserialize<'a>,
+        T: Serialize,
     {
         let res = self
             .client
@@ -50,9 +50,9 @@ impl PkClient {
     }
 
     pub async fn post<T>(&self, endpoint: &str, body: &T) -> Result<T, Box<dyn Error>>
-        where
-            T: for<'a> Deserialize<'a>,
-            T: Serialize,
+    where
+        T: for<'a> Deserialize<'a>,
+        T: Serialize,
     {
         let res = self
             .client

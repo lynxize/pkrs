@@ -1,5 +1,6 @@
-use clap::{Parser, Subcommand};
+use clap::builder::Str;
 use clap::{Arg, ArgAction, Command};
+use clap::{Parser, Subcommand};
 
 use crate::types::AutoProxyMode;
 
@@ -60,13 +61,13 @@ pub enum SystemSetCommands {
         avatar: String, // todo: validate url
     },
     Timezone {
-        timezone: String // todo, be better
+        timezone: String, // todo, be better
     },
     Pings {
         pings: bool,
     },
     AutoProxy {
-        mode: AutoProxyMode
+        mode: AutoProxyMode,
     },
     Guilds {
         guild_id: String,
@@ -81,34 +82,18 @@ pub enum SystemSetCommands {
 
 #[derive(Subcommand)]
 pub enum SystemSetGuildCommands {
-    Proxy {
-        should_proxy: bool
-    },
-    Tag {
-        tag: String
-    },
+    Proxy { should_proxy: bool },
+    Tag { tag: String },
 }
 
 #[derive(Subcommand)]
 pub enum SystemSetPrivacyCommands {
-    Description {
-        is_public: bool
-    },
-    Pronouns {
-        is_public: bool
-    },
-    Members {
-        is_public: bool
-    },
-    Groups {
-        is_public: bool
-    },
-    Front {
-        is_public: bool
-    },
-    FrontHistory {
-        is_public: bool
-    }
+    Description { is_public: bool },
+    Pronouns { is_public: bool },
+    Members { is_public: bool },
+    Groups { is_public: bool },
+    Front { is_public: bool },
+    FrontHistory { is_public: bool },
 }
 
 #[derive(Subcommand)]
@@ -124,9 +109,18 @@ pub enum MemberCommands {
         #[clap(subcommand)]
         command: MemberSetCommands,
     },
-    Create,
+    Create {
+        #[arg(short, long)]
+        name: Option<String>,
+        #[arg(short, long)]
+        avatar: Option<String>,
+        #[arg(short, long)]
+        description: Option<String>,
+    },
     Delete {
         member_id: String,
+        #[arg(short, long)]
+        confirm: Option<bool>,
     },
     Group {
         member_id: String,
@@ -138,84 +132,62 @@ pub enum MemberCommands {
 #[derive(Subcommand)]
 pub enum MemberSetCommands {
     Name {
-        name: String
+        name: String,
     },
     DisplayName {
-        display_name: String
+        display_name: String,
     },
     Description {
-        description: String
+        description: String,
     },
     Color {
-        color: String // todo: be better
+        color: String, // todo: be better
     },
     Birthday {
-        birthday: String // todo: be better
+        birthday: String, // todo: be better
     },
     Pronouns {
-        pronouns: String
+        pronouns: String,
     },
     Avatar {
-        avatar: String // todo: validate url
+        avatar: String, // todo: validate url
     },
     Banner {
-        banner: String // todo: validate url
+        banner: String, // todo: validate url
     },
     Proxy {
         #[clap(subcommand)]
-        command: MemberSetProxyCommands
+        command: MemberSetProxyCommands,
     },
     Privacy {
         #[clap(subcommand)]
-        command: MemberSetPrivacyCommands
+        command: MemberSetPrivacyCommands,
     },
 }
 
 #[derive(Subcommand)]
 pub enum MemberSetProxyCommands {
-    Add {
-        tag: String
-    },
-    Delete {
-        tag: String
-    },
+    Add { tag: String },
+    Delete { tag: String },
     List,
 }
 
 #[derive(Subcommand)]
 pub enum MemberSetPrivacyCommands {
-    Visibility {
-        is_public: bool
-    },
-    Name {
-        is_public: bool
-    },
-    Description {
-        is_public: bool
-    },
-    Avatar {
-        is_public: bool
-    },
-    Pronouns {
-        is_public: bool
-    },
-    Birthday {
-        is_public: bool
-    },
-    Metadata {
-        is_public: bool
-    },
+    Visibility { is_public: bool },
+    Name { is_public: bool },
+    Description { is_public: bool },
+    Avatar { is_public: bool },
+    Pronouns { is_public: bool },
+    Birthday { is_public: bool },
+    Metadata { is_public: bool },
 }
 
 #[derive(Subcommand)]
 pub enum MemberGroupCommands {
     List,
-    Add {
-        group_id: String
-    },
-    Remove {
-        group_id: String
-    },
+    Add { group_id: String },
+    Remove { group_id: String },
 }
 
 #[derive(Subcommand)]
@@ -227,7 +199,8 @@ pub enum GroupCommands {
         system_id: Option<String>,
     },
     Create {
-        name: String,
+        #[arg(short, long)]
+        name: Option<String>,
     },
     Add {
         group_id: String,
@@ -246,49 +219,37 @@ pub enum GroupCommands {
 #[derive(Subcommand)]
 pub enum GroupSetCommands {
     Name {
-        name: String
+        name: String,
     },
     DisplayName {
-        display_name: String
+        display_name: String,
     },
     Description {
-        description: String
+        description: String,
     },
     Color {
-        color: String // todo: be better
+        color: String, // todo: be better
     },
     Icon {
-        icon: String // todo: validate url
+        icon: String, // todo: validate url
     },
     Banner {
-        banner: String // todo: validate url
+        banner: String, // todo: validate url
     },
     Privacy {
         #[clap(subcommand)]
-        command: GroupSetPrivacyCommands
+        command: GroupSetPrivacyCommands,
     },
 }
 
 #[derive(Subcommand)]
 pub enum GroupSetPrivacyCommands {
-    Visibility {
-        is_public: bool
-    },
-    Name {
-        is_public: bool
-    },
-    Description {
-        is_public: bool
-    },
-    Icon {
-        is_public: bool
-    },
-    List {
-        is_public: bool
-    },
-    Metadata {
-        is_public: bool
-    },
+    Visibility { is_public: bool },
+    Name { is_public: bool },
+    Description { is_public: bool },
+    Icon { is_public: bool },
+    List { is_public: bool },
+    Metadata { is_public: bool },
 }
 
 #[derive(Subcommand)]
@@ -297,6 +258,7 @@ pub enum SwitchCommands {
         system_id: Option<String>,
     },
     New {
-        members: Vec<String>
+        members: Vec<String>,
+        time: Option<String>, // todo: validate date
     },
 }
