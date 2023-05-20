@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use reqwest::{Client, RequestBuilder, Response};
+use reqwest::Response;
 use serde::{Deserialize, Serialize};
 
 use crate::api::types::*;

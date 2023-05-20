@@ -1,6 +1,4 @@
-use clap::{Arg, ArgAction, Command};
-use clap::{Parser, Subcommand};
-use clap::builder::Str;
+use clap::Subcommand;
 
 use crate::api::types::AutoProxyMode;
 
