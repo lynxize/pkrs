@@ -4,10 +4,7 @@ use reqwest::StatusCode;
 
 use crate::api::endpoints::*;
 use crate::api::types::*;
-
-
 use crate::command::def::member::*;
-
 use crate::util::get_input;
 
 pub async fn handle_member(
