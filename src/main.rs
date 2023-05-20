@@ -1,12 +1,32 @@
 use std::error::Error;
 
-mod api;
-mod command_handler;
-mod commands;
-mod types;
+use crate::command::handle::base::handle_commands;
+
+mod api {
+    pub mod endpoints;
+    pub mod types;
+}
+
+mod command {
+    pub mod def {
+        pub mod base;
+        pub mod group;
+        pub mod member;
+        pub mod system;
+    }
+
+    pub mod handle {
+        pub mod base;
+        pub mod group;
+        pub mod member;
+        pub mod system;
+    }
+}
+
 mod util;
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    command_handler::handle_commands().await
+    handle_commands().await
 }
