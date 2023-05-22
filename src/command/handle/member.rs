@@ -2,7 +2,7 @@ use std::error::Error;
 
 use reqwest::StatusCode;
 
-use crate::api::endpoints::*;
+use crate::api::client::PkClient;
 use crate::api::types::*;
 use crate::command::def::member::*;
 use crate::util::get_input;
@@ -13,7 +13,7 @@ pub async fn handle_member(
 ) -> Result<(), Box<dyn Error>> {
     match command {
         MemberCommands::Get { member_id } => {
-            let member = get_member(&client, member_id.as_str()).await?;
+            let member = client.get_member(member_id.as_str()).await?;
             println!("Member: {:?}", member);
         }
         MemberCommands::Create {
@@ -23,8 +23,7 @@ pub async fn handle_member(
         } => {
             // todo: cleanup
             let n = name.unwrap_or_else(|| get_input("Name: "));
-            let m = create_member(
-                &client,
+            let m = client.create_member(
                 &Member {
                     id: "".to_string(),
                     uuid: "".to_string(),
@@ -44,7 +43,7 @@ pub async fn handle_member(
                     message_count: None,
                     last_message_timestamp: None,
                     privacy: None,
-                },
+                }
             )
                 .await?;
             println!("Created Member: {}", &m.name)
@@ -52,7 +51,7 @@ pub async fn handle_member(
         MemberCommands::Delete { member_id, confirm } => {
             let c = confirm.unwrap_or_else(|| get_input("Confirm (y/n): ").contains("y"));
             if c {
-                let res = delete_member(&client, member_id.as_str()).await?;
+                let res = client.delete_member(member_id.as_str()).await?;
 
                 if res.status() == StatusCode::NO_CONTENT {
                     println!("Deleted member {}", member_id);

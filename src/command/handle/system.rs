@@ -1,7 +1,7 @@
 use std::error::Error;
 
-use crate::api::endpoints::get_system;
-use crate::api::types::{PkClient, System};
+use crate::api::client::PkClient;
+use crate::api::types::System;
 use crate::command::def::system::*;
 
 pub async fn handle_system(
@@ -11,8 +11,7 @@ pub async fn handle_system(
 ) -> Result<(), Box<dyn Error>> {
     match command {
         SystemCommands::Get { system_id } => {
-            let system = get_system(
-                &client,
+            let system = client.get_system(
                 system_id.unwrap_or(default_sys.id).as_str(),
             )
                 .await?;
@@ -34,7 +33,7 @@ async fn handle_system_set(
     match command {
         SystemSetCommands::Name { name } => {
             sys.name = Some(name.clone());
-            sys.update(client).await?;
+            client.update_system(&sys).await?;
             if sys.name == Some(name.clone()) {
                 println!("Set name to {}", &name);
             } else {
@@ -43,7 +42,7 @@ async fn handle_system_set(
         }
         SystemSetCommands::Tag { tag } => {
             sys.tag = Some(tag.clone());
-            sys.update(client).await?;
+            client.update_system(&sys).await?;
             if sys.tag == Some(tag.clone()) {
                 println!("Set tag to {}", &tag);
             } else {
@@ -52,7 +51,7 @@ async fn handle_system_set(
         }
         SystemSetCommands::Description { description } => {
             sys.description = Some(description.clone());
-            sys.update(client).await?;
+            client.update_system(&sys).await?;
             if sys.description == Some(description.clone()) {
                 println!("Set description to {}", &description);
             } else {
