@@ -4,8 +4,7 @@ use std::fs;
 use clap::Parser;
 use reqwest::Client;
 
-use crate::api::endpoints::get_system;
-use crate::api::types::PkClient;
+use crate::api::client::PkClient;
 use crate::command::def::base::*;
 use crate::command::handle::member::handle_member;
 use crate::command::handle::system::*;
@@ -19,7 +18,7 @@ pub(crate) async fn handle_commands() -> Result<(), Box<dyn Error>> {
 
     let cli = Cli::parse();
 
-    let default_sys = get_system(&client, "txipz").await?;
+    let default_sys = client.get_system("txipz").await?;
 
     match cli.command {
         Some(Commands::Token { token }) => {

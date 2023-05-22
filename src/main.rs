@@ -3,7 +3,7 @@ use std::error::Error;
 use crate::command::handle::base::handle_commands;
 
 mod api {
-    pub mod endpoints;
+    pub mod client;
     pub mod types;
 }
 
