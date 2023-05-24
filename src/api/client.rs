@@ -2,6 +2,7 @@ use std::error::Error;
 
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 
 use crate::api::types::*;
 
@@ -24,11 +25,11 @@ impl PkClient {
             .header("User-Agent", &self.user_agent)
             .header("Authorization", &self.token)
             .send()
-            .await?
-            .json::<T>()
             .await?;
-        //println!("{:#?}", res);
-        Ok(res)
+        println!("{:#?}", res);
+        let r = res.json::<T>()
+            .await?;
+        Ok(r)
     }
 
     pub async fn patch<T>(&self, endpoint: &str, body: &T) -> Result<T, Box<dyn Error>>
@@ -293,7 +294,7 @@ impl PkClient {
     pub async fn get_system_switches(
         &self,
         system_id: &str,
-        before: &str,
+        before: &OffsetDateTime,
         limit: &i32,
     ) -> Result<Vec<Switch>, Box<dyn Error>> {
         let req = "systems/".to_string() + system_id + "/switches";
@@ -312,12 +313,13 @@ impl PkClient {
     pub async fn create_switch(
         &self,
         system_id: &str,
-        member_ids: &Vec<&str>,
-        time: String,
+        member_ids: &[&str],
+        time: OffsetDateTime,
     ) -> Result<(), Box<dyn Error>> {
         #[derive(Serialize, Deserialize, Debug)]
         struct JsonSwitch {
-            timestamp: String,
+            #[serde(with="time::serde::rfc3339")]
+            timestamp: OffsetDateTime,
             members: Vec<String>,
         }
 
