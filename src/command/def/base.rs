@@ -42,6 +42,11 @@ pub enum SwitchCommands {
     },
     New {
         members: Vec<String>,
+
+        #[arg(short, long)]
         time: Option<String>, // todo: validate date
     },
+    Move {
+        time: String // todo: validate
+    }
 }

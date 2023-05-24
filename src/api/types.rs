@@ -3,6 +3,7 @@ use std::error::Error;
 use clap::ValueEnum;
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct System {
@@ -11,7 +12,8 @@ pub struct System {
     pub description: Option<String>,
     pub tag: Option<String>,
     pub avatar_url: Option<String>,
-    pub created: Option<String>,
+    #[serde(with="crate::util::timeser")]
+    pub created: Option<OffsetDateTime>,
     pub privacy: Option<SystemPrivacy>,
 }
 
@@ -38,12 +40,14 @@ pub struct Member {
     pub webhook_avatar_url: Option<String>,
     pub banner: Option<String>,
     pub description: Option<String>,
-    pub created: Option<String>,
+    #[serde(with="crate::util::timeser")]
+    pub created: Option<OffsetDateTime>,
     pub proxy_tags: Vec<ProxyTag>,
     pub keep_proxy: bool,
     pub autoproxy_enabled: Option<bool>,
     pub message_count: Option<i32>,
-    pub last_message_timestamp: Option<String>,
+    #[serde(with="crate::util::timeser")]
+    pub last_message_timestamp: Option<OffsetDateTime>,
     pub privacy: Option<MemberPrivacy>,
 }
 
@@ -90,19 +94,23 @@ pub struct GroupPrivacy {
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Switch {
     pub id: String,
-    pub time: String,
-    pub members: Vec<SwitchMember>,
+    #[serde(with="time::serde::rfc3339")]
+    pub timestamp: OffsetDateTime,
+    pub members: Vec<String>,
 }
 
+/* // todo: handle (and verify) the fact that it can sometimes send member objects
 #[derive(Deserialize, Serialize, Debug)]
 pub enum SwitchMember {
     Full(Box<Member>),
     Id(String),
 }
+ */
 
 #[derive(Deserialize, Debug)]
 pub struct Message {
-    pub timestamp: String,
+    #[serde(with="time::serde::rfc3339")]
+    pub timestamp: OffsetDateTime,
     pub original: String,
     pub sender: String,
     pub channel: String,
@@ -135,7 +143,8 @@ pub struct SystemGuildSettings {
 pub struct AutoProxySettings {
     pub autoproxy_mode: AutoProxyMode,
     pub autoproxy_member: Option<String>,
-    pub last_latch_timestamp: Option<String>,
+    #[serde(with="crate::util::timeser")]
+    pub last_latch_timestamp: Option<OffsetDateTime>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, ValueEnum)]
