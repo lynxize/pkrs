@@ -7,9 +7,9 @@ use time::{OffsetDateTime, Time, UtcOffset};
 
 use crate::api::client::PkClient;
 use crate::api::types::System;
-use crate::command::def::base::*;
-use crate::command::handle::member::handle_member;
-use crate::command::handle::system::*;
+use crate::command::def::*;
+use crate::command::member::handle_member;
+use crate::command::system::*;
 
 pub(crate) async fn handle_commands() -> Result<(), Box<dyn Error>> {
     let mut client = PkClient {

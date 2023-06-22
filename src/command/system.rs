@@ -2,7 +2,7 @@ use std::error::Error;
 
 use crate::api::client::PkClient;
 use crate::api::types::System;
-use crate::command::def::system::*;
+use crate::command::def::*;
 
 pub async fn handle_system(
     client: &mut PkClient,

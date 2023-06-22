@@ -318,7 +318,7 @@ impl PkClient {
     ) -> Result<(), Box<dyn Error>> {
         #[derive(Serialize, Deserialize, Debug)]
         struct JsonSwitch {
-            #[serde(with="time::serde::rfc3339")]
+            #[serde(with = "time::serde::rfc3339")]
             timestamp: OffsetDateTime,
             members: Vec<String>,
         }

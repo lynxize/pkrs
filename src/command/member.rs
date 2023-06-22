@@ -4,7 +4,7 @@ use reqwest::StatusCode;
 
 use crate::api::client::PkClient;
 use crate::api::types::*;
-use crate::command::def::member::*;
+use crate::command::def::*;
 use crate::util::get_input;
 
 pub async fn handle_member(

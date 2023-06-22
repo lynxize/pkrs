@@ -12,7 +12,7 @@ pub struct System {
     pub description: Option<String>,
     pub tag: Option<String>,
     pub avatar_url: Option<String>,
-    #[serde(with="crate::util::timeser")]
+    #[serde(with = "crate::util::timeser")]
     pub created: Option<OffsetDateTime>,
     pub privacy: Option<SystemPrivacy>,
 }
@@ -40,13 +40,13 @@ pub struct Member {
     pub webhook_avatar_url: Option<String>,
     pub banner: Option<String>,
     pub description: Option<String>,
-    #[serde(with="crate::util::timeser")]
+    #[serde(with = "crate::util::timeser")]
     pub created: Option<OffsetDateTime>,
     pub proxy_tags: Vec<ProxyTag>,
     pub keep_proxy: bool,
     pub autoproxy_enabled: Option<bool>,
     pub message_count: Option<i32>,
-    #[serde(with="crate::util::timeser")]
+    #[serde(with = "crate::util::timeser")]
     pub last_message_timestamp: Option<OffsetDateTime>,
     pub privacy: Option<MemberPrivacy>,
 }
@@ -94,7 +94,7 @@ pub struct GroupPrivacy {
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Switch {
     pub id: String,
-    #[serde(with="time::serde::rfc3339")]
+    #[serde(with = "time::serde::rfc3339")]
     pub timestamp: OffsetDateTime,
     pub members: Vec<String>,
 }
@@ -109,7 +109,7 @@ pub enum SwitchMember {
 
 #[derive(Deserialize, Debug)]
 pub struct Message {
-    #[serde(with="time::serde::rfc3339")]
+    #[serde(with = "time::serde::rfc3339")]
     pub timestamp: OffsetDateTime,
     pub original: String,
     pub sender: String,
@@ -143,7 +143,7 @@ pub struct SystemGuildSettings {
 pub struct AutoProxySettings {
     pub autoproxy_mode: AutoProxyMode,
     pub autoproxy_member: Option<String>,
-    #[serde(with="crate::util::timeser")]
+    #[serde(with = "crate::util::timeser")]
     pub last_latch_timestamp: Option<OffsetDateTime>,
 }
 
