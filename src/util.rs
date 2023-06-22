@@ -9,8 +9,8 @@ pub fn get_input(prompt: &str) -> String {
 
 // see https://users.rust-lang.org/t/solved-serde-deserialize-with-for-option-s/12749/2
 pub mod timeser {
-    use time::OffsetDateTime;
     use serde::{Deserialize, Deserializer, Serialize};
+    use time::OffsetDateTime;
 
     pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<OffsetDateTime>, D::Error>
         where
@@ -26,12 +26,12 @@ pub mod timeser {
         where
             S: serde::Serializer,
     {
-       date.map(|date| WrappedOffsetDateTime { value: date.clone() }).serialize(serializer)
+        date.map(|date| WrappedOffsetDateTime { value: date.clone() }).serialize(serializer)
     }
 
     #[derive(Debug, Serialize, Deserialize)]
-    struct WrappedOffsetDateTime{
-        #[serde(with="time::serde::rfc3339")]
-        pub value: OffsetDateTime
+    struct WrappedOffsetDateTime {
+        #[serde(with = "time::serde::rfc3339")]
+        pub value: OffsetDateTime,
     }
 }

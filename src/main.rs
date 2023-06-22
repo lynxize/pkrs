@@ -1,29 +1,10 @@
 use std::error::Error;
 
-use crate::command::handle::base::handle_commands;
-
-mod api {
-    pub mod client;
-    pub mod types;
-}
-
-mod command {
-    pub mod def {
-        pub mod base;
-        pub mod group;
-        pub mod member;
-        pub mod system;
-    }
-
-    pub mod handle {
-        pub mod base;
-        pub mod group;
-        pub mod member;
-        pub mod system;
-    }
-}
+use crate::command::base::handle_commands;
 
 mod util;
+mod command;
+mod api;
 
 
 #[tokio::main]
