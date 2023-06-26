@@ -25,6 +25,7 @@ impl Default for PkClient {
 }
 
 impl PkClient {
+    // all
     async fn get<T>(&self, endpoint: &str) -> Result<T, Error>
         where
             T: for<'a> Deserialize<'a>,
@@ -35,6 +36,19 @@ impl PkClient {
         ).await
     }
 
+    // of this
+    async fn get_query<T>(&self, endpoint: &str, query: &Vec<(&str, &str)>) -> Result<T, Error>
+        where
+            T: for<'a> Deserialize<'a>,
+    {
+        self.nonsense(self
+            .client
+            .get(BASE_URL.to_string() + endpoint)
+            .query(query)
+        ).await
+    }
+
+    // duplication
     async fn patch<T>(&self, endpoint: &str, body: &T) -> Result<T, Error>
         where
             T: for<'a> Deserialize<'a>,
@@ -47,6 +61,21 @@ impl PkClient {
         ).await
     }
 
+    // feels
+    async fn patch_query<T>(&self, endpoint: &str, body: &T, query: &Vec<(&str, &str)>) -> Result<T, Error>
+        where
+            T: for<'a> Deserialize<'a>,
+            T: Serialize,
+    {
+        self.nonsense(self
+            .client
+            .patch(BASE_URL.to_string() + endpoint)
+            .query(query)
+            .json(body)
+        ).await
+    }
+
+    // unclean
     async fn post<T>(&self, endpoint: &str, body: &T) -> Result<T, Error>
         where
             T: for<'a> Deserialize<'a>,
@@ -58,6 +87,7 @@ impl PkClient {
             .json(body)
         ).await
     }
+
 
     async fn nonsense<T>(&self, builder: RequestBuilder) -> Result<T, Error>
         where
@@ -137,20 +167,20 @@ impl PkClient {
     pub async fn get_system_autoproxy_settings(
         &self,
         system_id: &str,
+        guild_id: &str,
     ) -> Result<AutoProxySettings, Error> {
-        todo!(); // need to handle query string
         let req = "systems/".to_string() + system_id + "/autoproxy";
-        self.get(req.as_str()).await
+        self.get_query(req.as_str(), &vec![("guild_id", guild_id)]).await
     }
 
     pub async fn update_system_autoproxy_settings(
         &self,
         system_id: &str,
+        guild_id: &str,
         settings: &AutoProxySettings,
     ) -> Result<AutoProxySettings, Error> {
-        todo!(); // need to handle query string
         let req = "systems/".to_string() + system_id + "/autoproxy";
-        self.patch(req.as_str(), settings).await
+        self.patch_query(req.as_str(), settings, &vec![("guild_id", guild_id)]).await
     }
 
     pub async fn get_system_members(
