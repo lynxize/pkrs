@@ -4,14 +4,24 @@ use reqwest::{Client, Error, Response, RequestBuilder};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
-use crate::types::*;
+use crate::model::*;
 
 pub const BASE_URL: &str = "https://api.pluralkit.me/v2/";
 
 pub struct PkClient {
-    client: Client,
+    pub client: Client,
     pub token: String,
-    user_agent: String,
+    pub user_agent: String,
+}
+
+impl Default for PkClient {
+    fn default() -> Self {
+        PkClient {
+            client: Client::new(),
+            token: "".to_string(),
+            user_agent: "pk + rust project".to_string(),
+        }
+    }
 }
 
 impl PkClient {
