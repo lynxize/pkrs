@@ -1,6 +1,5 @@
 use std::error::Error;
 
-use clap::ValueEnum;
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
@@ -99,14 +98,6 @@ pub struct Switch {
     pub members: Vec<String>,
 }
 
-/* // todo: handle (and verify) the fact that it can sometimes send member objects
-#[derive(Deserialize, Serialize, Debug)]
-pub enum SwitchMember {
-    Full(Box<Member>),
-    Id(String),
-}
- */
-
 #[derive(Deserialize, Debug)]
 pub struct Message {
     #[serde(with = "time::serde::rfc3339")]
@@ -147,7 +138,7 @@ pub struct AutoProxySettings {
     pub last_latch_timestamp: Option<OffsetDateTime>,
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone, ValueEnum)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub enum AutoProxyMode {
     Off,
     Front,
