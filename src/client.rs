@@ -4,7 +4,7 @@ use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
-use crate::api::types::*;
+use crate::types::*;
 
 pub const BASE_URL: &str = "https://api.pluralkit.me/v2/";
 
