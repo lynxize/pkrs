@@ -99,6 +99,7 @@ pub struct Switch {
 pub struct Message {
     #[serde(with = "time::serde::rfc3339")]
     pub timestamp: OffsetDateTime,
+    pub id: String,
     pub original: String,
     pub sender: String,
     pub channel: String,
@@ -136,6 +137,7 @@ pub struct AutoProxySettings {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "lowercase")]
 pub enum AutoProxyMode {
     Off,
     Front,
