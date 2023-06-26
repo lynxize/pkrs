@@ -15,12 +15,12 @@ pub struct System {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SystemPrivacy {
-    pub description_privacy: String,
-    pub pronoun_privacy: String,
-    pub member_list_privacy: String,
-    pub group_list_privacy: String,
-    pub front_privacy: String,
-    pub front_history_privacy: String,
+    pub description_privacy: Privacy,
+    pub pronoun_privacy: Privacy,
+    pub member_list_privacy: Privacy,
+    pub group_list_privacy: Privacy,
+    pub front_privacy: Privacy,
+    pub front_history_privacy: Privacy,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -49,13 +49,13 @@ pub struct Member {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct MemberPrivacy {
-    pub visibility: String,
-    pub name_privacy: String,
-    pub description_privacy: String,
-    pub birthday_privacy: String,
-    pub pronoun_privacy: String,
-    pub avatar_privacy: String,
-    pub metadata_privacy: String,
+    pub visibility: Privacy,
+    pub name_privacy: Privacy,
+    pub description_privacy: Privacy,
+    pub birthday_privacy: Privacy,
+    pub pronoun_privacy: Privacy,
+    pub avatar_privacy: Privacy,
+    pub metadata_privacy: Privacy,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -79,12 +79,12 @@ pub struct Group {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GroupPrivacy {
-    pub name_privacy: String,
-    pub description_privacy: String,
-    pub icon_privacy: String,
-    pub list_privacy: String,
-    pub metadata_privacy: String,
-    pub visibility: String,
+    pub name_privacy: Privacy,
+    pub description_privacy: Privacy,
+    pub icon_privacy: Privacy,
+    pub list_privacy: Privacy,
+    pub metadata_privacy: Privacy,
+    pub visibility: Privacy,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -141,6 +141,13 @@ pub enum AutoProxyMode {
     Front,
     Latch,
     Member,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "lowercase")]
+pub enum Privacy {
+    Public,
+    Private
 }
 
 #[derive(Deserialize, Serialize, Debug)]
