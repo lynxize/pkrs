@@ -1,6 +1,3 @@
-use std::error::Error;
-
-use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
@@ -11,7 +8,7 @@ pub struct System {
     pub description: Option<String>,
     pub tag: Option<String>,
     pub avatar_url: Option<String>,
-    #[serde(with = "crate::timeser")]
+    #[serde(with = "time::serde::rfc3339::option")]
     pub created: Option<OffsetDateTime>,
     pub privacy: Option<SystemPrivacy>,
 }
@@ -39,13 +36,13 @@ pub struct Member {
     pub webhook_avatar_url: Option<String>,
     pub banner: Option<String>,
     pub description: Option<String>,
-    #[serde(with = "crate::timeser")]
+    #[serde(with = "time::serde::rfc3339::option")]
     pub created: Option<OffsetDateTime>,
     pub proxy_tags: Vec<ProxyTag>,
     pub keep_proxy: bool,
     pub autoproxy_enabled: Option<bool>,
     pub message_count: Option<i32>,
-    #[serde(with = "crate::timeser")]
+    #[serde(with = "time::serde::rfc3339::option")]
     pub last_message_timestamp: Option<OffsetDateTime>,
     pub privacy: Option<MemberPrivacy>,
 }
@@ -134,7 +131,7 @@ pub struct SystemGuildSettings {
 pub struct AutoProxySettings {
     pub autoproxy_mode: AutoProxyMode,
     pub autoproxy_member: Option<String>,
-    #[serde(with = "crate::timeser")]
+    #[serde(with = "time::serde::rfc3339::option")]
     pub last_latch_timestamp: Option<OffsetDateTime>,
 }
 

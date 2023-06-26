@@ -10,5 +10,4 @@ license = "MIT"
 [dependencies]
 serde = { version = "1.0.163", features = ["derive"] }
 reqwest = { version = "0.11.17", features = ["json"] }
-tokio = { version = "1", features = ["full"] }
 time = { version = "0.3.21", features = ["serde-well-known"] }
