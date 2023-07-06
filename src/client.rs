@@ -1,12 +1,12 @@
 
 
-use reqwest::{Client, Error, Response, RequestBuilder};
+use reqwest::{Client, Error, Response, RequestBuilder, StatusCode};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
 use crate::model::*;
 
-pub const BASE_URL: &str = "https://api.pluralkit.me/v2/";
+const BASE_URL: &str = "https://api.pluralkit.me/v2/";
 
 pub struct PkClient {
     pub client: Client,
@@ -30,7 +30,7 @@ impl PkClient {
         where
             T: for<'a> Deserialize<'a>,
     {
-        self.nonsense(self
+        self.get_json(self
             .client
             .get(BASE_URL.to_string() + endpoint)
         ).await
@@ -41,7 +41,7 @@ impl PkClient {
         where
             T: for<'a> Deserialize<'a>,
     {
-        self.nonsense(self
+        self.get_json(self
             .client
             .get(BASE_URL.to_string() + endpoint)
             .query(query)
@@ -54,7 +54,7 @@ impl PkClient {
             T: for<'a> Deserialize<'a>,
             T: Serialize,
     {
-        self.nonsense(self
+        self.get_json(self
             .client
             .patch(BASE_URL.to_string() + endpoint)
             .json(body)
@@ -67,7 +67,7 @@ impl PkClient {
             T: for<'a> Deserialize<'a>,
             T: Serialize,
     {
-        self.nonsense(self
+        self.get_json(self
             .client
             .patch(BASE_URL.to_string() + endpoint)
             .query(query)
@@ -81,7 +81,7 @@ impl PkClient {
             T: for<'a> Deserialize<'a>,
             T: Serialize,
     {
-        self.nonsense(self
+        self.get_json(self
             .client
             .post(BASE_URL.to_string() + endpoint)
             .json(body)
@@ -89,21 +89,21 @@ impl PkClient {
     }
 
 
-    async fn nonsense<T>(&self, builder: RequestBuilder) -> Result<T, Error>
+    async fn get_json<T>(&self, builder: RequestBuilder) -> Result<T, Error>
         where
             T: for<'a> Deserialize<'a>,
     {
-        let req = builder
+        let r = self.req(builder).await?;
+        r.json::<T>().await
+    }
+
+
+    async fn req(&self, builder: RequestBuilder) -> Result<Response, Error> {
+        builder
             .header("User-Agent", &self.user_agent)
             .header("Authorization", &self.token)
             .send()
-            .await;
-
-        if let Ok(res) = req {
-            res.json::<T>().await
-        } else {
-            Err(req.unwrap_err())
-        }
+            .await
     }
 
 
@@ -221,10 +221,20 @@ impl PkClient {
     pub async fn add_member_groups(
         &self,
         member_id: &str,
-        group_id: &Vec<String>,
+        group_ids: &[&str],
     ) -> Result<(), Error> {
-        let req = "members/".to_string() + member_id + "/groups/add";
-        todo!()
+
+        let r = self.req(
+            self.client
+            .post(BASE_URL.to_string() + "members/" + member_id + "/groups/add")
+                .json(group_ids)
+        ).await?;
+        if r.status() == StatusCode::NO_CONTENT {
+            Ok(())
+        } else {
+            // does this even work?
+           Err(r.error_for_status().unwrap_err())
+        }
     }
 
     pub async fn remove_member_groups(
