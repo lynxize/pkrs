@@ -37,7 +37,7 @@ impl PkClient {
     }
 
     // of this
-    async fn get_query<T>(&self, endpoint: &str, query: &Vec<(&str, &str)>) -> Result<T, Error>
+    async fn get_query<T>(&self, endpoint: &str, query: &[(&str, &str)]) -> Result<T, Error>
         where
             T: for<'a> Deserialize<'a>,
     {
@@ -62,7 +62,7 @@ impl PkClient {
     }
 
     // feels
-    async fn patch_query<T>(&self, endpoint: &str, body: &T, query: &Vec<(&str, &str)>) -> Result<T, Error>
+    async fn patch_query<T>(&self, endpoint: &str, body: &T, query: &[(&str, &str)]) -> Result<T, Error>
         where
             T: for<'a> Deserialize<'a>,
             T: Serialize,
@@ -170,7 +170,7 @@ impl PkClient {
         guild_id: &str,
     ) -> Result<AutoProxySettings, Error> {
         let req = "systems/".to_string() + system_id + "/autoproxy";
-        self.get_query(req.as_str(), &vec![("guild_id", guild_id)]).await
+        self.get_query(req.as_str(), &[("guild_id", guild_id)]).await
     }
 
     pub async fn update_system_autoproxy_settings(
@@ -240,7 +240,7 @@ impl PkClient {
     pub async fn remove_member_groups(
         &self,
         member_id: &str,
-        group: &Vec<String>,
+        group: &[&str],
     ) -> Result<(), Error> {
         let req = "members/".to_string() + member_id + "/groups/remove";
         todo!()
@@ -249,7 +249,7 @@ impl PkClient {
     pub async fn overwrite_member_groups(
         &self,
         member_id: &str,
-        group_ids: &Vec<String>,
+        group_ids: &[&str],
     ) -> Result<(), Error> {
         let req = "members/".to_string() + member_id + "/groups/overwrite";
         todo!()
@@ -312,7 +312,7 @@ impl PkClient {
     pub async fn add_group_members(
         &self,
         group_id: &str,
-        members: &Vec<String>,
+        members:&[&str],
     ) -> Result<(), Error> {
         let req = "groups/".to_string() + group_id + "/members/add";
         todo!()
@@ -321,7 +321,7 @@ impl PkClient {
     pub async fn remove_group_members(
         &self,
         group_id: &str,
-        members: &Vec<String>,
+        members: &[&str],
     ) -> Result<(), Error> {
         let req = "groups/".to_string() + group_id + "/members/remove";
         todo!()
@@ -330,7 +330,7 @@ impl PkClient {
     pub async fn overwrite_group_members(
         &self,
         group_id: &str,
-        member_ids: &Vec<String>,
+        member_ids: &[&str],
     ) -> Result<(), Error> {
         let req = "groups/".to_string() + group_id + "/members/overwrite";
         todo!()
