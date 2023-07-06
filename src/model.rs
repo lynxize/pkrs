@@ -149,7 +149,7 @@ pub enum AutoProxyMode {
 #[serde(rename_all = "lowercase")]
 pub enum Privacy {
     Public,
-    Private
+    Private,
 }
 
 #[derive(Deserialize, Serialize, Debug)]

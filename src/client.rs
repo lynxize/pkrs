@@ -1,4 +1,4 @@
-use reqwest::{Client, Error, Response, RequestBuilder, StatusCode};
+use reqwest::{Client, Error, RequestBuilder, Response, StatusCode};
 use serde::{Deserialize, Serialize};
 use time::format_description::well_known::Rfc3339;
 use time::OffsetDateTime;
@@ -26,76 +26,77 @@ impl Default for PkClient {
 impl PkClient {
     // all
     async fn get<T>(&self, endpoint: &str) -> Result<T, Error>
-        where
-            T: for<'a> Deserialize<'a>,
+    where
+        T: for<'a> Deserialize<'a>,
     {
-        self.get_json(self
-            .client
-            .get(BASE_URL.to_string() + endpoint)
-        ).await
+        self.get_json(self.client.get(BASE_URL.to_string() + endpoint))
+            .await
     }
 
     // of this
     async fn get_query<T>(&self, endpoint: &str, query: &[(&str, &str)]) -> Result<T, Error>
-        where
-            T: for<'a> Deserialize<'a>,
+    where
+        T: for<'a> Deserialize<'a>,
     {
-        self.get_json(self
-            .client
-            .get(BASE_URL.to_string() + endpoint)
-            .query(query)
-        ).await
+        self.get_json(
+            self.client
+                .get(BASE_URL.to_string() + endpoint)
+                .query(query),
+        )
+        .await
     }
 
     // duplication
     async fn patch<T>(&self, endpoint: &str, body: &T) -> Result<T, Error>
-        where
-            T: for<'a> Deserialize<'a>,
-            T: Serialize,
+    where
+        T: for<'a> Deserialize<'a>,
+        T: Serialize,
     {
-        self.get_json(self
-            .client
-            .patch(BASE_URL.to_string() + endpoint)
-            .json(body)
-        ).await
+        self.get_json(
+            self.client
+                .patch(BASE_URL.to_string() + endpoint)
+                .json(body),
+        )
+        .await
     }
 
     // feels
-    async fn patch_query<T>(&self, endpoint: &str, body: &T, query: &[(&str, &str)]) -> Result<T, Error>
-        where
-            T: for<'a> Deserialize<'a>,
-            T: Serialize,
+    async fn patch_query<T>(
+        &self,
+        endpoint: &str,
+        body: &T,
+        query: &[(&str, &str)],
+    ) -> Result<T, Error>
+    where
+        T: for<'a> Deserialize<'a>,
+        T: Serialize,
     {
-        self.get_json(self
-            .client
-            .patch(BASE_URL.to_string() + endpoint)
-            .query(query)
-            .json(body)
-        ).await
+        self.get_json(
+            self.client
+                .patch(BASE_URL.to_string() + endpoint)
+                .query(query)
+                .json(body),
+        )
+        .await
     }
 
     // unclean
     async fn post<T>(&self, endpoint: &str, body: &T) -> Result<T, Error>
-        where
-            T: for<'a> Deserialize<'a>,
-            T: Serialize,
+    where
+        T: for<'a> Deserialize<'a>,
+        T: Serialize,
     {
-        self.get_json(self
-            .client
-            .post(BASE_URL.to_string() + endpoint)
-            .json(body)
-        ).await
+        self.get_json(self.client.post(BASE_URL.to_string() + endpoint).json(body))
+            .await
     }
 
-
     async fn get_json<T>(&self, builder: RequestBuilder) -> Result<T, Error>
-        where
-            T: for<'a> Deserialize<'a>,
+    where
+        T: for<'a> Deserialize<'a>,
     {
         let r = self.req(builder).await?;
         r.json::<T>().await
     }
-
 
     async fn req(&self, builder: RequestBuilder) -> Result<Response, Error> {
         builder
@@ -105,17 +106,14 @@ impl PkClient {
             .await
     }
 
-
     async fn delete(&self, endpoint: &str) -> Result<Response, Error> {
-        self
-            .client
+        self.client
             .delete(BASE_URL.to_string() + endpoint)
             .header("User-Agent", &self.user_agent)
             .header("Authorization", &self.token)
             .send()
             .await
     }
-
 
     pub async fn get_system(&self, system_id: &str) -> Result<System, Error> {
         let req = "systems/".to_string() + system_id;
@@ -127,10 +125,7 @@ impl PkClient {
         self.patch(req.as_str(), system).await
     }
 
-    pub async fn get_system_settings(
-        &self,
-        system_id: &str,
-    ) -> Result<SystemSettings, Error> {
+    pub async fn get_system_settings(&self, system_id: &str) -> Result<SystemSettings, Error> {
         let req = "systems/".to_string() + system_id + "/settings";
         self.get(req.as_str()).await
     }
@@ -169,7 +164,8 @@ impl PkClient {
         guild_id: &str,
     ) -> Result<AutoProxySettings, Error> {
         let req = "systems/".to_string() + system_id + "/autoproxy";
-        self.get_query(req.as_str(), &[("guild_id", guild_id)]).await
+        self.get_query(req.as_str(), &[("guild_id", guild_id)])
+            .await
     }
 
     pub async fn update_system_autoproxy_settings(
@@ -179,13 +175,11 @@ impl PkClient {
         settings: &AutoProxySettings,
     ) -> Result<AutoProxySettings, Error> {
         let req = "systems/".to_string() + system_id + "/autoproxy";
-        self.patch_query(req.as_str(), settings, &vec![("guild_id", guild_id)]).await
+        self.patch_query(req.as_str(), settings, &[("guild_id", guild_id)])
+            .await
     }
 
-    pub async fn get_system_members(
-        &self,
-        system_id: &str,
-    ) -> Result<Vec<Member>, Error> {
+    pub async fn get_system_members(&self, system_id: &str) -> Result<Vec<Member>, Error> {
         let req = "systems/".to_string() + system_id + "/members";
         self.get(req.as_str()).await
     }
@@ -209,20 +203,24 @@ impl PkClient {
         self.delete(req.as_str()).await
     }
 
-    pub async fn get_member_groups(
-        &self,
-        member_id: &str,
-    ) -> Result<Vec<Group>, Error> {
+    pub async fn get_member_groups(&self, member_id: &str) -> Result<Vec<Group>, Error> {
         let req = "members/".to_string() + member_id + "/groups";
         self.get(req.as_str()).await
     }
 
-    async fn member_groups(&self, action: &str, member_id: &str, group_ids: &[&str]) -> Result<(), Error> {
-        let r = self.req(
-            self.client
-                .post(BASE_URL.to_string() + "members/" + member_id + "/groups/" + action)
-                .json(group_ids)
-        ).await?;
+    async fn member_groups(
+        &self,
+        action: &str,
+        member_id: &str,
+        group_ids: &[&str],
+    ) -> Result<(), Error> {
+        let r = self
+            .req(
+                self.client
+                    .post(BASE_URL.to_string() + "members/" + member_id + "/groups/" + action)
+                    .json(group_ids),
+            )
+            .await?;
         if r.status() == StatusCode::NO_CONTENT {
             Ok(())
         } else {
@@ -274,10 +272,7 @@ impl PkClient {
         self.patch(req.as_str(), settings).await
     }
 
-    pub async fn get_system_groups(
-        &self,
-        system_id: &str,
-    ) -> Result<Vec<Group>, Error> {
+    pub async fn get_system_groups(&self, system_id: &str) -> Result<Vec<Group>, Error> {
         let req = "systems/".to_string() + system_id + "/groups";
         self.get(req.as_str()).await
     }
@@ -301,20 +296,24 @@ impl PkClient {
         self.delete(req.as_str()).await
     }
 
-    pub async fn get_group_members(
-        &self,
-        group_id: &str,
-    ) -> Result<Vec<Member>, Error> {
+    pub async fn get_group_members(&self, group_id: &str) -> Result<Vec<Member>, Error> {
         let req = "groups/".to_string() + group_id + "/members";
         self.get(req.as_str()).await
     }
 
-    async fn group_members(&self, action: &str, group_id: &str, member_ids: &[&str]) -> Result<(), Error> {
-        let r = self.req(
-            self.client
-                .post(BASE_URL.to_string() + "groups/" + group_id + "/members/" + action)
-                .json(member_ids)
-        ).await?;
+    async fn group_members(
+        &self,
+        action: &str,
+        group_id: &str,
+        member_ids: &[&str],
+    ) -> Result<(), Error> {
+        let r = self
+            .req(
+                self.client
+                    .post(BASE_URL.to_string() + "groups/" + group_id + "/members/" + action)
+                    .json(member_ids),
+            )
+            .await?;
         if r.status() == StatusCode::NO_CONTENT {
             Ok(())
         } else {
@@ -328,7 +327,7 @@ impl PkClient {
         group_id: &str,
         member_ids: &[&str],
     ) -> Result<(), Error> {
-       self.group_members("add", group_id, member_ids).await
+        self.group_members("add", group_id, member_ids).await
     }
 
     pub async fn remove_group_members(
@@ -358,15 +357,13 @@ impl PkClient {
             req.as_str(),
             &[
                 ("before", before.format(&Rfc3339).unwrap().as_str()),
-                ("limit", limit.to_string().as_str())
-            ]
-        ).await
+                ("limit", limit.to_string().as_str()),
+            ],
+        )
+        .await
     }
 
-    pub async fn get_system_fronters(
-        &self,
-        system_id: &str,
-    ) -> Result<Switch, Error> {
+    pub async fn get_system_fronters(&self, system_id: &str) -> Result<Switch, Error> {
         let req = "systems/".to_string() + system_id + "/fronters";
         self.get(req.as_str()).await
     }
@@ -385,15 +382,14 @@ impl PkClient {
         }
 
         let req = "systems/".to_string() + system_id + "/switches";
-        self
-            .post::<JsonSwitch>(
-                req.as_str(),
-                &JsonSwitch {
-                    timestamp: time,
-                    members: member_ids.iter().map(|&s| s.into()).collect(),
-                },
-            )
-            .await?;
+        self.post::<JsonSwitch>(
+            req.as_str(),
+            &JsonSwitch {
+                timestamp: time,
+                members: member_ids.iter().map(|&s| s.into()).collect(),
+            },
+        )
+        .await?;
 
         Ok(())
     }
