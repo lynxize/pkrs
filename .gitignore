@@ -1,5 +1,4 @@
 target/
 .idea/
 pkrs.iml
-token
-design
+Cargo.lock
