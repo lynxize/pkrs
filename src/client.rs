@@ -218,32 +218,34 @@ impl PkClient {
         self.get(req.as_str()).await
     }
 
-    pub async fn add_member_groups(
-        &self,
-        member_id: &str,
-        group_ids: &[&str],
-    ) -> Result<(), Error> {
-
+    async fn member_groups(&self, action: &str, member_id: &str, group_ids: &[&str]) -> Result<(), Error> {
         let r = self.req(
             self.client
-            .post(BASE_URL.to_string() + "members/" + member_id + "/groups/add")
+                .post(BASE_URL.to_string() + "members/" + member_id + "/groups/" + action)
                 .json(group_ids)
         ).await?;
         if r.status() == StatusCode::NO_CONTENT {
             Ok(())
         } else {
             // does this even work?
-           Err(r.error_for_status().unwrap_err())
+            Err(r.error_for_status().unwrap_err())
         }
+    }
+
+    pub async fn add_member_groups(
+        &self,
+        member_id: &str,
+        group_ids: &[&str],
+    ) -> Result<(), Error> {
+        self.member_groups("add", member_id, group_ids).await
     }
 
     pub async fn remove_member_groups(
         &self,
         member_id: &str,
-        group: &[&str],
+        group_ids: &[&str],
     ) -> Result<(), Error> {
-        let req = "members/".to_string() + member_id + "/groups/remove";
-        todo!()
+        self.member_groups("remove", member_id, group_ids).await
     }
 
     pub async fn overwrite_member_groups(
@@ -251,8 +253,7 @@ impl PkClient {
         member_id: &str,
         group_ids: &[&str],
     ) -> Result<(), Error> {
-        let req = "members/".to_string() + member_id + "/groups/overwrite";
-        todo!()
+        self.member_groups("overwrite", member_id, group_ids).await
     }
 
     pub async fn get_member_guild_settings(
@@ -309,22 +310,34 @@ impl PkClient {
         self.get(req.as_str()).await
     }
 
+    async fn group_members(&self, action: &str, group_id: &str, member_ids: &[&str]) -> Result<(), Error> {
+        let r = self.req(
+            self.client
+                .post(BASE_URL.to_string() + "groups/" + group_id + "/members/" + action)
+                .json(member_ids)
+        ).await?;
+        if r.status() == StatusCode::NO_CONTENT {
+            Ok(())
+        } else {
+            // does this even work?
+            Err(r.error_for_status().unwrap_err())
+        }
+    }
+
     pub async fn add_group_members(
         &self,
         group_id: &str,
-        members:&[&str],
+        member_ids: &[&str],
     ) -> Result<(), Error> {
-        let req = "groups/".to_string() + group_id + "/members/add";
-        todo!()
+       self.group_members("add", group_id, member_ids).await
     }
 
     pub async fn remove_group_members(
         &self,
         group_id: &str,
-        members: &[&str],
+        member_ids: &[&str],
     ) -> Result<(), Error> {
-        let req = "groups/".to_string() + group_id + "/members/remove";
-        todo!()
+        self.group_members("remove", group_id, member_ids).await
     }
 
     pub async fn overwrite_group_members(
@@ -332,8 +345,7 @@ impl PkClient {
         group_id: &str,
         member_ids: &[&str],
     ) -> Result<(), Error> {
-        let req = "groups/".to_string() + group_id + "/members/overwrite";
-        todo!()
+        self.group_members("overwrite", group_id, member_ids).await
     }
 
     pub async fn get_system_switches(
