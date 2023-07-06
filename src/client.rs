@@ -1,7 +1,6 @@
-
-
 use reqwest::{Client, Error, Response, RequestBuilder, StatusCode};
 use serde::{Deserialize, Serialize};
+use time::format_description::well_known::Rfc3339;
 use time::OffsetDateTime;
 
 use crate::model::*;
@@ -355,8 +354,13 @@ impl PkClient {
         limit: &i32,
     ) -> Result<Vec<Switch>, Error> {
         let req = "systems/".to_string() + system_id + "/switches";
-        // todo: handle before and limit
-        self.get(req.as_str()).await
+        self.get_query(
+            req.as_str(),
+            &[
+                ("before", before.format(&Rfc3339).unwrap().as_str()),
+                ("limit", limit.to_string().as_str())
+            ]
+        ).await
     }
 
     pub async fn get_system_fronters(
