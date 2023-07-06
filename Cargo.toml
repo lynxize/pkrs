@@ -8,6 +8,12 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = { version = "1.0.163", features = ["derive"] }
-reqwest = { version = "0.11.17", features = ["json"] }
-time = { version = "0.3.21", features = ["serde-well-known"] }
+serde = { version = "1.0", features = ["derive"] }
+reqwest = { version = "0.11", features = ["json"] }
+time = { version = "0.3", features = ["serde-well-known"] }
+
+# dumb duct tape due to the serde version of this crate
+# not being compatible with nightly rust
+# have to force a newer version
+# todo: this is dumb
+proc-macro2 = "1.0.63"
