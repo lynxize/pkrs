@@ -1,6 +1,6 @@
 [package]
 name = "pkrs"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 description = "A simple wrapper around the PluralKit API"
 authors = ["Snowdrift"]

@@ -80,13 +80,23 @@ impl PkClient {
         .await
     }
 
-    // unclean
+    // extremely
     async fn post<T>(&self, endpoint: &str, body: &T) -> Result<T, Error>
+        where
+            T: for<'a> Deserialize<'a>,
+            T: Serialize,
+    {
+        self.get_json(self.client.post(BASE_URL.to_string() + endpoint).json(body))
+            .await
+    }
+
+    // unclean
+    async fn post_only<T>(&self, endpoint: &str, body: &T) -> Result<Response, Error>
     where
         T: for<'a> Deserialize<'a>,
         T: Serialize,
     {
-        self.get_json(self.client.post(BASE_URL.to_string() + endpoint).json(body))
+        self.req(self.client.post(BASE_URL.to_string() + endpoint).json(body))
             .await
     }
 
@@ -382,7 +392,7 @@ impl PkClient {
         }
 
         let req = "systems/".to_string() + system_id + "/switches";
-        self.post::<JsonSwitch>(
+        self.post_only::<JsonSwitch>(
             req.as_str(),
             &JsonSwitch {
                 timestamp: time,
