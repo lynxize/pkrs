@@ -25,19 +25,13 @@ impl Default for PkClient {
 
 impl PkClient {
     // all
-    async fn get<T>(&self, endpoint: &str) -> Result<T, Error>
-    where
-        T: for<'a> Deserialize<'a>,
-    {
+    async fn get<T: for<'a> Deserialize<'a>>(&self, endpoint: &str) -> Result<T, Error> {
         self.get_json(self.client.get(BASE_URL.to_string() + endpoint))
             .await
     }
 
     // of this
-    async fn get_query<T>(&self, endpoint: &str, query: &[(&str, &str)]) -> Result<T, Error>
-    where
-        T: for<'a> Deserialize<'a>,
-    {
+    async fn get_query<T: for<'a> Deserialize<'a>>(&self, endpoint: &str, query: &[(&str, &str)]) -> Result<T, Error> {
         self.get_json(
             self.client
                 .get(BASE_URL.to_string() + endpoint)
@@ -47,9 +41,8 @@ impl PkClient {
     }
 
     // duplication
-    async fn patch<T>(&self, endpoint: &str, body: &T) -> Result<T, Error>
+    async fn patch<T: for<'a> Deserialize<'a>>(&self, endpoint: &str, body: &T) -> Result<T, Error>
     where
-        T: for<'a> Deserialize<'a>,
         T: Serialize,
     {
         self.get_json(
@@ -61,14 +54,13 @@ impl PkClient {
     }
 
     // feels
-    async fn patch_query<T>(
+    async fn patch_query<T: for<'a> Deserialize<'a>>(
         &self,
         endpoint: &str,
         body: &T,
         query: &[(&str, &str)],
     ) -> Result<T, Error>
     where
-        T: for<'a> Deserialize<'a>,
         T: Serialize,
     {
         self.get_json(
@@ -81,29 +73,23 @@ impl PkClient {
     }
 
     // extremely
-    async fn post<T>(&self, endpoint: &str, body: &T) -> Result<T, Error>
+    async fn post<T: for<'a> Deserialize<'a>>(&self, endpoint: &str, body: &T) -> Result<T, Error>
         where
-            T: for<'a> Deserialize<'a>,
             T: Serialize,
     {
-        self.get_json(self.client.post(BASE_URL.to_string() + endpoint).json(body))
+        self.get_json(self.client.post(BASE_URL.to_string() + endpoint)
+            .json(body))
             .await
     }
 
     // unclean
-    async fn post_only<T>(&self, endpoint: &str, body: &T) -> Result<Response, Error>
-    where
-        T: for<'a> Deserialize<'a>,
-        T: Serialize,
-    {
-        self.req(self.client.post(BASE_URL.to_string() + endpoint).json(body))
+    async fn post_only<T: Serialize>(&self, endpoint: &str, body: &T) -> Result<Response, Error>  {
+        self.req(self.client.post(BASE_URL.to_string() + endpoint)
+            .json(body))
             .await
     }
 
-    async fn get_json<T>(&self, builder: RequestBuilder) -> Result<T, Error>
-    where
-        T: for<'a> Deserialize<'a>,
-    {
+    async fn get_json<T: for<'a> Deserialize<'a>>(&self, builder: RequestBuilder) -> Result<T, Error> {
         let r = self.req(builder).await?;
         r.json::<T>().await
     }
@@ -381,13 +367,13 @@ impl PkClient {
     pub async fn create_switch(
         &self,
         system_id: &str,
-        member_ids: &[&str],
-        time: OffsetDateTime,
-    ) -> Result<(), Error> {
+        member_ids: Vec<String>,
+        time: Option<OffsetDateTime>,
+    ) -> Result<Response, Error> {
         #[derive(Serialize, Deserialize, Debug)]
         struct JsonSwitch {
-            #[serde(with = "time::serde::rfc3339")]
-            timestamp: OffsetDateTime,
+            #[serde(with = "time::serde::rfc3339::option")]
+            timestamp: Option<OffsetDateTime>,
             members: Vec<String>,
         }
 
@@ -396,12 +382,10 @@ impl PkClient {
             req.as_str(),
             &JsonSwitch {
                 timestamp: time,
-                members: member_ids.iter().map(|&s| s.into()).collect(),
+                members: member_ids,
             },
         )
-        .await?;
-
-        Ok(())
+        .await
     }
 
     pub async fn get_message(&self, id: &str) -> Result<Message, Error> {
