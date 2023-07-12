@@ -2,6 +2,7 @@ use reqwest::{Client, Error, RequestBuilder, Response, StatusCode};
 use serde::{Deserialize, Serialize};
 use time::format_description::well_known::Rfc3339;
 use time::OffsetDateTime;
+use uuid::Uuid;
 
 use crate::model::*;
 
@@ -112,17 +113,17 @@ impl PkClient {
     }
 
     pub async fn get_system(&self, system_id: &PkId) -> Result<System, Error> {
-        let req = "systems/".to_string() + system_id;
+        let req = format!("systems/{}", system_id.to_string());
         self.get(req.as_str()).await
     }
 
     pub async fn update_system(&self, system: &System) -> Result<System, Error> {
-        let req = "systems/".to_string() + &system.id;
+        let req = format!("systems/{}", system.id.to_string());
         self.patch(req.as_str(), system).await
     }
 
     pub async fn get_system_settings(&self, system_id: &PkId) -> Result<SystemSettings, Error> {
-        let req = "systems/".to_string() + system_id + "/settings";
+        let req = format!("systems/{}/settings", system_id.to_string());
         self.get(req.as_str()).await
     }
 
@@ -131,7 +132,7 @@ impl PkClient {
         system_id: &PkId,
         settings: &SystemSettings,
     ) -> Result<SystemSettings, Error> {
-        let req = "systems/".to_string() + system_id + "/settings";
+        let req = format!("systems/{}/settings", system_id.to_string());
         self.patch(req.as_str(), settings).await
     }
 
@@ -140,7 +141,7 @@ impl PkClient {
         system_id: &PkId,
         guild_id: &str,
     ) -> Result<SystemGuildSettings, Error> {
-        let req = "systems/".to_string() + system_id + "/settings/guilds/" + guild_id;
+        let req = format!("systems/{}/settings/guilds/{}", system_id.to_string(), guild_id);
         self.get(req.as_str()).await
     }
 
@@ -150,7 +151,7 @@ impl PkClient {
         guild_id: &str,
         settings: &SystemGuildSettings,
     ) -> Result<SystemGuildSettings, Error> {
-        let req = "systems/".to_string() + system_id + "/settings/guilds/" + guild_id;
+        let req = format!("systems/{}/settings/guilds/{}", system_id.to_string(), guild_id);
         self.patch(req.as_str(), settings).await
     }
 
@@ -159,7 +160,7 @@ impl PkClient {
         system_id: &PkId,
         guild_id: &str,
     ) -> Result<AutoProxySettings, Error> {
-        let req = "systems/".to_string() + system_id + "/autoproxy";
+        let req = format!("systems/{}/autoproxy", system_id.to_string());
         self.get_query(req.as_str(), &[("guild_id", guild_id)])
             .await
     }
@@ -170,13 +171,13 @@ impl PkClient {
         guild_id: &str,
         settings: &AutoProxySettings,
     ) -> Result<AutoProxySettings, Error> {
-        let req = "systems/".to_string() + system_id + "/autoproxy";
+        let req = format!("systems/{}/autoproxy", system_id.to_string());
         self.patch_query(req.as_str(), settings, &[("guild_id", guild_id)])
             .await
     }
 
     pub async fn get_system_members(&self, system_id: &PkId) -> Result<Vec<Member>, Error> {
-        let req = "systems/".to_string() + system_id + "/members";
+        let req = format!("systems/{}/members", system_id.to_string());
         self.get(req.as_str()).await
     }
 
@@ -185,22 +186,22 @@ impl PkClient {
     }
 
     pub async fn get_member(&self, member_id: &PkId) -> Result<Member, Error> {
-        let req = "members/".to_string() + member_id;
+        let req = format!("members/{}", member_id.to_string());
         self.get(req.as_str()).await
     }
 
     pub async fn update_member(&self, member: &Member) -> Result<Member, Error> {
-        let req = "members/".to_string() + &member.id;
+        let req = format!("members/{}", member.id.to_string());
         self.patch(req.as_str(), member).await
     }
 
     pub async fn delete_member(&self, member_id: &PkId) -> Result<Response, Error> {
-        let req = "members/".to_string() + member_id;
+        let req = format!("members/{}", member_id.to_string());
         self.delete(req.as_str()).await
     }
 
     pub async fn get_member_groups(&self, member_id: &PkId) -> Result<Vec<Group>, Error> {
-        let req = "members/".to_string() + member_id + "/groups";
+        let req = format!("members/{}/groups", member_id.to_string());
         self.get(req.as_str()).await
     }
 
@@ -213,7 +214,7 @@ impl PkClient {
         let r = self
             .req(
                 self.client
-                    .post(BASE_URL.to_string() + "members/" + member_id + "/groups/" + action)
+                    .post(format!("{}members/{}/groups/{}", BASE_URL, member_id.to_string(), action))
                     .json(group_ids),
             )
             .await?;
@@ -252,9 +253,9 @@ impl PkClient {
     pub async fn get_member_guild_settings(
         &self,
         member_id: &PkId,
-        guild_id: &PkId,
+        guild_id: &str,
     ) -> Result<Vec<MemberGuildSettings>, Error> {
-        let req = "members/".to_string() + member_id + "/guilds/" + guild_id;
+        let req = format!("members/{}/guilds/{}", member_id.to_string(), guild_id);
         self.get(req.as_str()).await
     }
 
@@ -264,12 +265,12 @@ impl PkClient {
         guild_id: &str,
         settings: &MemberGuildSettings,
     ) -> Result<MemberGuildSettings, Error> {
-        let req = "members/".to_string() + member_id + "/guilds/" + guild_id;
+        let req = format!("members/{}/guilds/{}", member_id.to_string(), guild_id);
         self.patch(req.as_str(), settings).await
     }
 
     pub async fn get_system_groups(&self, system_id: &PkId) -> Result<Vec<Group>, Error> {
-        let req = "systems/".to_string() + system_id + "/groups";
+        let req = format!("systems/{}/groups", system_id.to_string());
         self.get(req.as_str()).await
     }
 
@@ -278,22 +279,22 @@ impl PkClient {
     }
 
     pub async fn get_group(&self, group_id: &PkId) -> Result<Group, Error> {
-        let req = "groups/".to_string() + group_id;
+        let req = format!("groups/{}", group_id.to_string());
         self.get(req.as_str()).await
     }
 
     pub async fn update_group(&self, group: &Group) -> Result<Group, Error> {
-        let req = "groups/".to_string() + &*group.id;
+        let req = format!("groups/{}", group.id.to_string());
         self.patch(req.as_str(), group).await
     }
 
     pub async fn delete_group(&self, group_id: &PkId) -> Result<Response, Error> {
-        let req = "groups/".to_string() + group_id;
+        let req = format!("groups/{}", group_id.to_string());
         self.delete(req.as_str()).await
     }
 
     pub async fn get_group_members(&self, group_id: &PkId) -> Result<Vec<Member>, Error> {
-        let req = "groups/".to_string() + group_id + "/members";
+        let req = format!("groups/{}/members", group_id.to_string());
         self.get(req.as_str()).await
     }
 
@@ -306,7 +307,7 @@ impl PkClient {
         let r = self
             .req(
                 self.client
-                    .post(BASE_URL.to_string() + "groups/" + group_id + "/members/" + action)
+                    .post(format!("{}groups/{}/members/{}", BASE_URL.to_string(), group_id.to_string(), action))
                     .json(member_ids),
             )
             .await?;
@@ -344,13 +345,12 @@ impl PkClient {
 
     pub async fn get_system_switches(
         &self,
-        system_id: &str,
+        system_id: &PkId,
         before: &OffsetDateTime,
         limit: &i32,
     ) -> Result<Vec<Switch>, Error> {
-        let req = "systems/".to_string() + system_id + "/switches";
         self.get_query(
-            req.as_str(),
+            format!("systems/{}/switches", system_id.to_string()).as_str(),
             &[
                 ("before", before.format(&Rfc3339).unwrap().as_str()),
                 ("limit", limit.to_string().as_str()),
@@ -360,7 +360,7 @@ impl PkClient {
     }
 
     pub async fn get_system_fronters(&self, system_id: &PkId) -> Result<Switch, Error> {
-        let req = "systems/".to_string() + system_id + "/fronters";
+        let req = format!("systems/{}/fronters", system_id.to_string());
         self.get(req.as_str()).await
     }
 
@@ -371,16 +371,14 @@ impl PkClient {
         time: Option<OffsetDateTime>,
     ) -> Result<Response, Error> {
         #[derive(Serialize, Deserialize, Debug)]
-        struct JsonSwitch {
+        struct SwitchCreate {
             #[serde(with = "time::serde::rfc3339::option")]
             timestamp: Option<OffsetDateTime>,
             members: Vec<PkId>,
         }
-
-        let req = "systems/".to_string() + system_id + "/switches";
-        self.post_only::<JsonSwitch>(
-            req.as_str(),
-            &JsonSwitch {
+        self.post_only(
+            format!("systems/{}/switches", system_id.to_string()).as_str(),
+            &SwitchCreate {
                 timestamp: time,
                 members: member_ids,
             },
@@ -388,8 +386,41 @@ impl PkClient {
         .await
     }
 
+    pub async fn get_switch(&self, system_id: &PkId, switch_id: &Uuid) -> Result<Vec<Switch>, Error>{
+        let req = format!("systems/{}/switches/{}", system_id.to_string(), switch_id);
+        self.get(req.as_str()).await
+    }
+
+    pub async fn update_switch(&self, system_id: &PkId, switch_id: &Uuid, time: OffsetDateTime) -> Result<Switch, Error>{
+        let req = format!("systems/{}/switches/{}", system_id.to_string(), switch_id);
+        #[derive(Serialize, Deserialize, Debug)]
+        struct SwitchTimeUpdate {
+            #[serde(with = "time::serde::rfc3339")]
+            timestamp: OffsetDateTime
+        }
+        self.get_json(
+            self.client
+                .patch(BASE_URL.to_string() + req.as_str())
+                .json(&SwitchTimeUpdate{timestamp: time}),
+        ).await
+    }
+
+    pub async fn update_switch_members(&self, system_id: &PkId, switch_id: &Uuid, members: &[&PkId]) -> Result<Switch, Error> {
+        let req = format!("systems/{}/switches/{}/members", system_id.to_string(), switch_id);
+        self.get_json(
+            self.client
+                .patch(BASE_URL.to_string() + req.as_str())
+                .json(members),
+        ).await
+    }
+
+    pub async fn delete_switch(&self, system_id: &PkId, switch_id: &Uuid) -> Result<Response, Error> {
+        let req = format!("systems/{}/switches/{}", system_id.to_string(), switch_id);
+        self.delete(req.as_str()).await
+    }
+
     pub async fn get_message(&self, id: &str) -> Result<Message, Error> {
-        let req = "messages/".to_string() + id;
+        let req = format!("messages/{}", id);
         self.get(req.as_str()).await
     }
 }
