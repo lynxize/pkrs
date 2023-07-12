@@ -1,6 +1,6 @@
 [package]
 name = "pkrs"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 description = "A simple wrapper around the PluralKit API"
 authors = ["Snowdrift"]
@@ -10,6 +10,7 @@ license = "MIT"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
+serde_either = { version = "0.2" }
 reqwest = { version = "0.11", features = ["json"] }
 time = { version = "0.3", features = ["serde-well-known"] }
 

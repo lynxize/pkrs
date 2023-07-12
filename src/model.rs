@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_either::StringOrStruct;
 use time::OffsetDateTime;
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -92,7 +93,7 @@ pub struct Switch {
     pub id: String,
     #[serde(with = "time::serde::rfc3339")]
     pub timestamp: OffsetDateTime,
-    pub members: Vec<String>,
+    pub members: Vec<StringOrStruct<Member>>,
 }
 
 #[derive(Deserialize, Debug)]
