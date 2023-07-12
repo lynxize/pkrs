@@ -3,15 +3,18 @@
 //! It closely follows the structure of the API itself, and as such the official [API documentation](https://pluralkit.me/api/) is likely the best resource for now.
 //!
 //! # Examples
-//! Creating a `PkClient`
+//! Creating a `PkClient` and getting a `System`
 //! ```
 //! use pkrs::client::PkClient;
+//! use pkrs::model::System;
 //!
 //! let client = PkClient {
 //!     token: my-token,
 //!     user_agent: "my pk+rust project".to_string(),
-//!     client: Default::default()
+//!     ..Default::default()
 //! };
+//!
+//! let sys: System = client.get_system("abcde".into()).await?;
 //! ```
 
 pub mod client;

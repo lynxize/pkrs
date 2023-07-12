@@ -1,14 +1,48 @@
+use std::ops::Deref;
 use serde::{Deserialize, Serialize};
 use serde_either::StringOrStruct;
 use time::OffsetDateTime;
+use url::Url;
+use uuid::Uuid;
+
+
+// this feels pretty bad, but it works
+// if there's a better way to do this, lmk!
+// a simple type alias to String doesn't work
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(from = "String")]
+pub struct PkId {
+    id: String
+}
+impl From<String> for PkId {
+    fn from(value: String) -> Self {
+        PkId {
+            id: value
+        }
+    }
+}
+
+impl From<&str> for PkId {
+    fn from(value: &str) -> Self {
+        PkId::from(value.to_string())
+    }
+}
+
+impl Deref for PkId {
+    type Target = str;
+    fn deref(&self) -> &Self::Target {
+        self.id.as_str()
+    }
+}
+
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct System {
-    pub id: String,
+    pub id: PkId,
     pub name: Option<String>,
     pub description: Option<String>,
     pub tag: Option<String>,
-    pub avatar_url: Option<String>,
+    pub avatar_url: Option<Url>,
     #[serde(with = "time::serde::rfc3339::option")]
     pub created: Option<OffsetDateTime>,
     pub privacy: Option<SystemPrivacy>,
@@ -26,16 +60,16 @@ pub struct SystemPrivacy {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Member {
-    pub id: String,
-    pub uuid: String,
+    pub id: PkId,
+    pub uuid: Uuid,
     pub name: String,
     pub display_name: Option<String>,
     pub color: Option<String>,
     pub birthday: Option<String>,
     pub pronouns: Option<String>,
-    pub avatar_url: Option<String>,
-    pub webhook_avatar_url: Option<String>,
-    pub banner: Option<String>,
+    pub avatar_url: Option<Url>,
+    pub webhook_avatar_url: Option<Url>,
+    pub banner: Option<Url>,
     pub description: Option<String>,
     #[serde(with = "time::serde::rfc3339::option")]
     pub created: Option<OffsetDateTime>,
@@ -67,13 +101,13 @@ pub struct ProxyTag {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Group {
-    pub id: String,
-    pub uuid: String,
+    pub id: PkId,
+    pub uuid: Uuid,
     pub name: String,
     pub display_name: Option<String>,
     pub description: Option<String>,
-    pub icon: Option<String>,
-    pub banner: Option<String>,
+    pub icon: Option<Url>,
+    pub banner: Option<Url>,
     pub color: Option<String>,
     pub privacy: Option<GroupPrivacy>,
 }
@@ -90,7 +124,7 @@ pub struct GroupPrivacy {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Switch {
-    pub id: String,
+    pub id: Uuid,
     #[serde(with = "time::serde::rfc3339")]
     pub timestamp: OffsetDateTime,
     pub members: Vec<StringOrStruct<Member>>,
@@ -157,5 +191,5 @@ pub enum Privacy {
 pub struct MemberGuildSettings {
     pub guild_id: String,
     pub display_name: Option<String>,
-    pub avatar_url: Option<String>,
+    pub avatar_url: Option<Url>,
 }
