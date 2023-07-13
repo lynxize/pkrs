@@ -1,10 +1,10 @@
 use std::ops::Deref;
+
 use serde::{Deserialize, Serialize};
 use serde_either::StringOrStruct;
 use time::OffsetDateTime;
 use url::Url;
 use uuid::Uuid;
-
 
 // this feels pretty bad, but it works
 // if there's a better way to do this, lmk!
@@ -12,13 +12,12 @@ use uuid::Uuid;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(from = "String")]
 pub struct PkId {
-    id: String
+    id: String,
 }
+
 impl From<String> for PkId {
     fn from(value: String) -> Self {
-        PkId {
-            id: value
-        }
+        PkId { id: value }
     }
 }
 
@@ -34,7 +33,6 @@ impl Deref for PkId {
         self.id.as_str()
     }
 }
-
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct System {
