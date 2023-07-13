@@ -1,36 +1,16 @@
-use std::ops::Deref;
-
+use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 use serde_either::StringOrStruct;
 use time::OffsetDateTime;
 use url::Url;
 use uuid::Uuid;
 
-// this feels pretty bad, but it works
-// if there's a better way to do this, lmk!
-// a simple type alias to String doesn't work
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(from = "String")]
-pub struct PkId {
-    id: String,
-}
+pub struct PkId(pub String);
 
-impl From<String> for PkId {
-    fn from(value: String) -> Self {
-        PkId { id: value }
-    }
-}
-
-impl From<&str> for PkId {
-    fn from(value: &str) -> Self {
-        PkId::from(value.to_string())
-    }
-}
-
-impl Deref for PkId {
-    type Target = str;
-    fn deref(&self) -> &Self::Target {
-        self.id.as_str()
+impl Display for PkId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.0.as_str())
     }
 }
 
