@@ -5,6 +5,7 @@ edition = "2021"
 description = "A simple wrapper around the PluralKit API"
 authors = ["Snowdrift"]
 license = "MIT"
+repository = "https://github.com/snowdriftsystem/pkrs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
