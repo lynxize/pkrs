@@ -16,9 +16,3 @@ reqwest = { version = "0.11", features = ["json"] }
 time = { version = "0.3", features = ["serde-well-known"] }
 uuid = { version = "1.4", features = ["serde"]}
 url = { version = "2.4", features = ["serde"]}
-
-# dumb duct tape due to the serde version of this crate
-# not being compatible with nightly rust
-# have to force a newer version
-# todo: this is dumb, is there a better way?
-proc-macro2 = "1.0.63"
