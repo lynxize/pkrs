@@ -10,12 +10,13 @@
 //!
 //! let client = PkClient {
 //!     token: my-token,
-//!     user_agent: "my pk+rust project".to_string(),
 //!     ..Default::default()
 //! };
 //!
 //! let sys: System = client.get_system("abcde".into()).await?;
 //! ```
 
-pub mod client;
 pub mod model;
+
+#[cfg(feature="reqwest-client")]
+pub mod client;

@@ -19,7 +19,7 @@ impl Default for PkClient {
         PkClient {
             client: Client::new(),
             token: "".to_string(),
-            user_agent: "pk + rust project".to_string(),
+            user_agent: "pk + rust project".to_string(), // todo: this is kind of bad
         }
     }
 }
